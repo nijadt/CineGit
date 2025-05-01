@@ -118,7 +118,7 @@ flowchart TD
   Core_Backend -->|R/W| H
   Core_Backend -->|emit metrics/logs| J
   Core_Backend -->|enforce policies| K
-
+```
 
 ---
 
@@ -251,4 +251,3 @@ CineGit brings cloud-based version control to creative workflows.
 ---
 
 **🚀 Built for the future of collaborative, cloud-native film production.**
-```
