@@ -1,4 +1,3 @@
-
 # CineGit
 
 **The GitHub for Video Editing and Filmmaking**  
@@ -62,59 +61,53 @@ CineGit brings Git-style version control and collaborative editing tools to vide
 
 ## 🧱 System Architecture
 
-```txt
-Users (Web / PWA / Mobile Apps)
-     |
-     | HTTPS
-     v
-[Frontend - React + Next.js + TailwindCSS]
-     |
-     | GraphQL API Requests / OAuth
-     v
-[API Gateway (GraphQL Server)]
-     |
-     | gRPC Internal Calls
-     v
-+---------------------------------------------------+
-|                  Core Backend (Kubernetes)        |
-|---------------------------------------------------|
-| - Auth Service (JWT, OAuth2, SSO, RBAC)           |
-| - Project Service (Projects, Timelines, Branches) |
-| - Review Service (Comments, Cut Requests)         |
-| - Media Service (Upload, Proxy, Diff tools)       |
-| - Billing Service (Stripe Integration)            |
-| - Notification Service (Email, Webhooks)          |
-+---------------------------------------------------+
-     |
-     | Async messaging (Kafka / EventBridge)
-     v
-+---------------------------------------------------+
-|               Media Processing Layer             |
-|---------------------------------------------------|
-| - Transcoder (FFmpeg in Lambda / EKS Pods)        |
-| - Thumbnail Generator                            |
-| - Timeline Diff Engine (WebAssembly modules)      |
-| - Proxy File Generator (low-res video previews)   |
-+---------------------------------------------------+
-     |
-     v
-[Object Storage - AWS S3 (Versioned)]
-    + CloudFront CDN for Asset Delivery
-    + Media Fingerprinting for Deduplication
+```mermaid
+flowchart TD
+  A[Users (Web / PWA / Mobile Apps)]
+  B[Frontend (React + Next.js + TailwindCSS)]
+  C[API Gateway (GraphQL Server)]
+  D[Core Backend (Kubernetes Microservices)]
+  E[Media Processing Layer]
+  F[S3 Object Storage (Versioned)]
+  G[PostgreSQL (Project Metadata)]
+  H[Redis (Session Cache)]
+  I[CDN (CloudFront / R2)]
+  J[Monitoring & Observability<br>Prometheus / Grafana / Loki]
+  K[Security Layer<br>(WAF, TLS, AES, Signed URLs)]
+  
+  subgraph Core_Services [Core Backend Services]
+    D1[Auth Service<br>(JWT, OAuth2, SSO, RBAC)]
+    D2[Project Service<br>(Timelines, Branches)]
+    D3[Review Service<br>(Comments, Cut Requests)]
+    D4[Media Service<br>(Upload, Proxy, Diff)]
+    D5[Billing Service<br>(Stripe Integration)]
+    D6[Notification Service<br>(Webhooks, Emails)]
+  end
 
-[Database - PostgreSQL (Project Metadata)]
-[Cache Layer - Redis (Session data, Diff previews)]
+  subgraph Media_Tools [Media Processing Layer]
+    E1[FFmpeg Transcoder]
+    E2[Thumbnail Generator]
+    E3[Timeline Diff Engine (WASM)]
+    E4[Proxy Generator (Low-res Previews)]
+  end
 
-[Monitoring & Observability]
-- Prometheus (Metrics)
-- Grafana (Dashboards)
-- Loki (Logs Aggregation)
-
-[Security Layer]
-- Encrypted storage (AES-256)
-- Signed Upload/Download URLs
-- Web Application Firewall (WAF)
-- Rate Limiting & Abuse Detection
+  A -->|HTTPS| B -->|GraphQL API + OAuth| C -->|gRPC Calls| D
+  D --> D1
+  D --> D2
+  D --> D3
+  D --> D4
+  D --> D5
+  D --> D6
+  D -->|Async Events| E
+  E --> E1 --> F
+  E --> E2 --> F
+  E --> E3 --> F
+  E --> E4 --> F
+  D --> G
+  D --> H
+  F --> I
+  D --> J
+  D --> K
 ```
 
 ---
@@ -248,7 +241,3 @@ CineGit brings cloud-based version control to creative workflows.
 ---
 
 **🚀 Built for the future of collaborative, cloud-native film production.**
-
----
-
-```
