@@ -62,36 +62,39 @@ CineGit brings Git-style version control and collaborative editing tools to vide
 ## 🧱 System Architecture
 
 ```mermaid
+%%{init: {'theme': 'forest'}}%%
 flowchart TD
-  A[Users (Web / PWA / Mobile Apps)]
-  B[Frontend (React + Next.js + TailwindCSS)]
-  C[API Gateway (GraphQL Server)]
-  D[Core Backend (Kubernetes Microservices)]
-  E[Media Processing Layer]
-  F[S3 Object Storage (Versioned)]
-  G[PostgreSQL (Project Metadata)]
-  H[Redis (Session Cache)]
-  I[CDN (CloudFront / R2)]
-  J[Monitoring & Observability<br>Prometheus / Grafana / Loki]
-  K[Security Layer<br>(WAF, TLS, AES, Signed URLs)]
-  
-  subgraph Core_Services [Core Backend Services]
-    D1[Auth Service<br>(JWT, OAuth2, SSO, RBAC)]
-    D2[Project Service<br>(Timelines, Branches)]
-    D3[Review Service<br>(Comments, Cut Requests)]
-    D4[Media Service<br>(Upload, Proxy, Diff)]
-    D5[Billing Service<br>(Stripe Integration)]
-    D6[Notification Service<br>(Webhooks, Emails)]
+  A["Users (Web / PWA / Mobile Apps)"]
+  B["Frontend (React + Next.js + TailwindCSS)"]
+  C["API Gateway (GraphQL Server)"]
+  D["Core Backend (Kubernetes Microservices)"]
+  E["Media Processing Layer"]
+  F["S3 Object Storage (Versioned)"]
+  G["PostgreSQL (Project Metadata)"]
+  H["Redis (Session Cache)"]
+  I["CDN (CloudFront / R2)"]
+  J["Monitoring & Observability<br/>Prometheus / Grafana / Loki"]
+  K["Security Layer<br/>(WAF, TLS, AES, Signed URLs)"]
+
+  subgraph Core_Services["Core Backend Services"]
+    D1["Auth Service<br/>(JWT, OAuth2, SSO, RBAC)"]
+    D2["Project Service<br/>(Timelines, Branches)"]
+    D3["Review Service<br/>(Comments, Cut Requests)"]
+    D4["Media Service<br/>(Upload, Proxy, Diff)"]
+    D5["Billing Service<br/>(Stripe Integration)"]
+    D6["Notification Service<br/>(Webhooks, Emails)"]
   end
 
-  subgraph Media_Tools [Media Processing Layer]
-    E1[FFmpeg Transcoder]
-    E2[Thumbnail Generator]
-    E3[Timeline Diff Engine (WASM)]
-    E4[Proxy Generator (Low-res Previews)]
+  subgraph Media_Tools["Media Processing Layer"]
+    E1["FFmpeg Transcoder"]
+    E2["Thumbnail Generator"]
+    E3["Timeline Diff Engine (WASM)"]
+    E4["Proxy Generator (Low-res Previews)"]
   end
 
-  A -->|HTTPS| B -->|GraphQL API + OAuth| C -->|gRPC Calls| D
+  A -->|HTTPS| B
+  B -->|GraphQL API + OAuth| C
+  C -->|gRPC Calls| D
   D --> D1
   D --> D2
   D --> D3
