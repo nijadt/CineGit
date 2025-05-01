@@ -64,19 +64,18 @@ CineGit brings Git-style version control and collaborative editing tools to vide
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
 flowchart TD
-  A["Users (Web / PWA / Mobile Apps)"]
-  B["Frontend (React + Next.js + TailwindCSS)"]
-  C["API Gateway (GraphQL Server)"]
-  D["Core Backend (Kubernetes Microservices)"]
-  E["Media Processing Layer"]
-  F["S3 Object Storage (Versioned)"]
-  G["PostgreSQL (Project Metadata)"]
-  H["Redis (Session Cache)"]
-  I["CDN (CloudFront / R2)"]
-  J["Monitoring & Observability<br/>Prometheus / Grafana / Loki"]
-  K["Security Layer<br/>(WAF, TLS, AES, Signed URLs)"]
 
-  subgraph Core_Services["Core Backend Services"]
+  %% Users & Frontend
+  A["Users<br/>(Web / PWA / Mobile Apps)"]
+  B["Frontend<br/>(React + Next.js + TailwindCSS)"]
+  C["API Gateway<br/>(GraphQL Server)"]
+
+  A -->|HTTPS| B
+  B -->|GraphQL API + OAuth| C
+
+  %% Core Backend Services
+  subgraph Core_Backend["Core Backend Services<br/><i>Kubernetes Microservices</i>"]
+    direction TB
     D1["Auth Service<br/>(JWT, OAuth2, SSO, RBAC)"]
     D2["Project Service<br/>(Timelines, Branches)"]
     D3["Review Service<br/>(Comments, Cut Requests)"]
@@ -85,33 +84,41 @@ flowchart TD
     D6["Notification Service<br/>(Webhooks, Emails)"]
   end
 
-  subgraph Media_Tools["Media Processing Layer"]
+  C -->|gRPC calls| D1
+  C --> D2
+  C --> D3
+  C --> D4
+  C --> D5
+  C --> D6
+
+  %% Media Processing & Storage
+  subgraph Media_Layer["Media Processing Layer"]
+    direction TB
     E1["FFmpeg Transcoder"]
     E2["Thumbnail Generator"]
-    E3["Timeline Diff Engine (WASM)"]
-    E4["Proxy Generator (Low-res Previews)"]
+    E3["Timeline Diff Engine<br/>(WASM)"]
+    E4["Proxy Generator<br/>(Low-res Previews)"]
   end
 
-  A -->|HTTPS| B
-  B -->|GraphQL API + OAuth| C
-  C -->|gRPC Calls| D
-  D --> D1
-  D --> D2
-  D --> D3
-  D --> D4
-  D --> D5
-  D --> D6
-  D -->|Async Events| E
-  E --> E1 --> F
-  E --> E2 --> F
-  E --> E3 --> F
-  E --> E4 --> F
-  D --> G
-  D --> H
-  F --> I
-  D --> J
-  D --> K
-```
+  D4 -->|async events| E1
+  D4 --> E2
+  D4 --> E3
+  D4 --> E4
+
+  E1 & E2 & E3 & E4 --> F["S3 Object Storage<br/>(Versioned)"]
+  F --> I["CDN<br/>(CloudFront / R2)"]
+
+  %% Data Stores, Observability & Security
+  G["PostgreSQL<br/>(Project Metadata)"]
+  H["Redis<br/>(Session Cache)"]
+  J["Monitoring & Observability<br/>(Prometheus / Grafana / Loki)"]
+  K["Security Layer<br/>(WAF, TLS, AES, Signed URLs)"]
+
+  Core_Backend -->|R/W| G
+  Core_Backend -->|R/W| H
+  Core_Backend -->|emit metrics/logs| J
+  Core_Backend -->|enforce policies| K
+
 
 ---
 
@@ -244,3 +251,4 @@ CineGit brings cloud-based version control to creative workflows.
 ---
 
 **🚀 Built for the future of collaborative, cloud-native film production.**
+```
