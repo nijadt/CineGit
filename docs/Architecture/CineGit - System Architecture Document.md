@@ -12,7 +12,7 @@ This document outlines the proposed system architecture for CineGit, a cloud-nat
 The system follows a microservices architecture pattern, deployed on a cloud platform (e.g., AWS, GCP, Azure) using container orchestration (Kubernetes). A central API Gateway manages external access, routing requests to appropriate backend services. Media processing is handled asynchronously, and data is stored in dedicated databases and object storage.
 
 ```mermaid
-%%{init: {'theme': 'forest'}}%%
+%%{init: {'theme': 'neutral'}}%%
 flowchart TD
 
   subgraph "User Facing"
