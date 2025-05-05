@@ -12,100 +12,109 @@ This document outlines the proposed system architecture for CineGit, a cloud-nat
 The system follows a microservices architecture pattern, deployed on a cloud platform (e.g., AWS, GCP, Azure) using container orchestration (Kubernetes). A central API Gateway manages external access, routing requests to appropriate backend services. Media processing is handled asynchronously, and data is stored in dedicated databases and object storage.
 
 ```mermaid
-graph TD
-    subgraph User Facing
-        A[Web Client (React/Next.js PWA)]
-        B[NLE Plugins (Premiere, Resolve, FCPX)]
-        C[Mobile Apps (Future)]
-    end
+%%{init: {'theme': 'forest'}}%%
+flowchart TD
 
-    subgraph Core Services
-        D[API Gateway (GraphQL)]
-        E[Auth Service]
-        F[Project Service]
-        G[Timeline Service]
-        H[Asset Service]
-        I[Review Service]
-        J[Notification Service]
-        K[Billing Service]
-    end
+  subgraph "User Facing"
+    A["Web Client<br/>(React/Next.js PWA)"]
+    B["NLE Plugins<br/>(Premiere, Resolve, FCPX)"]
+    C["Mobile Apps<br/>(Future)"]
+  end
 
-    subgraph Data & Processing
-        L[Media Processing Pipeline (FFmpeg, WASM Diff)]
-        M[Event Bus (Kafka/EventBridge)]
-        N[PostgreSQL (Metadata)]
-        O[Redis (Cache/Sessions)]
-        P[Object Storage (S3/GCS)]
-        Q[CDN (CloudFront/Cloudflare)]
-    end
+  subgraph "Core Services"
+    D["API Gateway<br/>(GraphQL)"]
+    E["Auth Service"]
+    F["Project Service"]
+    G["Timeline Service"]
+    H["Asset Service"]
+    I["Review Service"]
+    J["Notification Service"]
+    K["Billing Service"]
+  end
 
-    subgraph Infrastructure & Ops
-        R[Kubernetes Cluster (EKS/GKE)]
-        S[CI/CD Pipeline (GitHub Actions/ArgoCD)]
-        T[Monitoring & Logging (Prometheus/Grafana/Loki)]
-        U[Infrastructure as Code (Terraform)]
-    end
+  subgraph "Data & Processing"
+    L["Media Processing Pipeline<br/>(FFmpeg, WASM Diff)"]
+    M["Event Bus<br/>(Kafka / EventBridge)"]
+    N["PostgreSQL<br/>(Metadata)"]
+    O["Redis<br/>(Cache / Sessions)"]
+    P["Object Storage<br/>(S3 / GCS)"]
+    Q["CDN<br/>(CloudFront / Cloudflare)"]
+  end
 
-    A --> D
-    B --> D
-    C --> D
+  subgraph "Infrastructure & Ops"
+    R["Kubernetes Cluster<br/>(EKS / GKE)"]
+    S["CI/CD Pipeline<br/>(GitHub Actions / ArgoCD)"]
+    T["Monitoring & Logging<br/>(Prometheus / Grafana / Loki)"]
+    U["Infrastructure as Code<br/>(Terraform)"]
+  end
 
-    D --> E
-    D --> F
-    D --> G
-    D --> H
-    D --> I
-    D --> J
-    D --> K
+  %% User flows
+  A --> D
+  B --> D
+  C --> D
 
-    H -- Triggers Processing --> M
-    M -- Events --> L
-    L -- Stores Results --> P
-    L -- Updates Metadata --> G
-    L -- Updates Metadata --> H
+  %% Core service calls
+  D --> E
+  D --> F
+  D --> G
+  D --> H
+  D --> I
+  D --> J
+  D --> K
 
-    E -- Reads/Writes --> N
-    F -- Reads/Writes --> N
-    G -- Reads/Writes --> N
-    H -- Reads/Writes --> N
-    I -- Reads/Writes --> N
-    K -- Reads/Writes --> N
+  %% Processing pipeline
+  H -- "Triggers Processing" --> M
+  M -- "Events" --> L
+  L -- "Stores Results" --> P
+  L -- "Updates Metadata" --> G
+  L -- "Updates Metadata" --> H
 
-    E -- Uses --> O
-    F -- Uses --> O
-    G -- Uses --> O
-    H -- Uses --> O
-    I -- Uses --> O
+  %% Datastores
+  E -- "Reads/Writes" --> N
+  F -- "Reads/Writes" --> N
+  G -- "Reads/Writes" --> N
+  H -- "Reads/Writes" --> N
+  I -- "Reads/Writes" --> N
+  K -- "Reads/Writes" --> N
 
-    H -- Stores/Retrieves --> P
-    P -- Serves Content --> Q
-    A -- Requests Content --> Q
-    B -- Requests Content --> Q
-    C -- Requests Content --> Q
+  E -- "Uses" --> O
+  F -- "Uses" --> O
+  G -- "Uses" --> O
+  H -- "Uses" --> O
+  I -- "Uses" --> O
 
-    M -- Events --> J
-    I -- Events --> J
-    F -- Events --> J
+  %% Static content delivery
+  H -- "Stores/Retrieves" --> P
+  P -- "Serves Content" --> Q
+  A -- "Requests Content" --> Q
+  B -- "Requests Content" --> Q
+  C -- "Requests Content" --> Q
 
-    R -- Hosts --> D
-    R -- Hosts --> E
-    R -- Hosts --> F
-    R -- Hosts --> G
-    R -- Hosts --> H
-    R -- Hosts --> I
-    R -- Hosts --> J
-    R -- Hosts --> K
-    R -- Hosts --> L
-    R -- Hosts --> M
+  %% Events & observability
+  M -- "Events" --> J
+  I -- "Events" --> J
+  F -- "Events" --> J
 
-    S -- Deploys --> R
-    T -- Monitors --> R
-    U -- Defines --> R
-    U -- Defines --> N
-    U -- Defines --> O
-    U -- Defines --> P
-    U -- Defines --> Q
-    U -- Defines --> M
+  %% Hosting & deployment
+  R -- "Hosts" --> D
+  R -- "Hosts" --> E
+  R -- "Hosts" --> F
+  R -- "Hosts" --> G
+  R -- "Hosts" --> H
+  R -- "Hosts" --> I
+  R -- "Hosts" --> J
+  R -- "Hosts" --> K
+  R -- "Hosts" --> L
+  R -- "Hosts" --> M
+
+  S -- "Deploys" --> R
+  T -- "Monitors" --> R
+  U -- "Defines" --> R
+  U -- "Defines" --> N
+  U -- "Defines" --> O
+  U -- "Defines" --> P
+  U -- "Defines" --> Q
+  U -- "Defines" --> M
 ```
 
 **Key Principles:**
